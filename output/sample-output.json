@@ -1,0 +1,50 @@
+{
+    "hashtags": [
+        "#ALUInnovationFair",
+        "#RegexPractice",
+        "#KigaliTech",
+        "#alu_volunteers"
+    ],
+    "time": [],
+    "credit_cards": [
+        "************1111",
+        "************0004",
+        "***********0005"
+    ],
+    "rejected_cards": [
+        "************1112",
+        "************0000"
+    ],
+    "emails": {
+        "all_valid": [
+            "maya.okafor@alueducation.com",
+            "kevin.nkurunziza@alumni.alueducation.com",
+            "grace.uwase@si.alueducation.com",
+            "general.inquiries@alueducation.com",
+            "old.student2019@alumni.alueducation.com",
+            "not-a-real-alu-email@aluedu.com"
+        ],
+        "alu_official": [
+            "maya.okafor@alueducation.com",
+            "general.inquiries@alueducation.com"
+        ],
+        "alu_alumni": [
+            "kevin.nkurunziza@alumni.alueducation.com",
+            "old.student2019@alumni.alueducation.com"
+        ],
+        "alu_si": [
+            "grace.uwase@si.alueducation.com"
+        ]
+    },
+    "times": [
+        "08:45",
+        "6:30 PM",
+        "14:30",
+        "09:00",
+        "9:30 AM",
+        "12:00 PM",
+        "1:15 PM",
+        "3:00 PM",
+        "17:45"
+    ]
+}

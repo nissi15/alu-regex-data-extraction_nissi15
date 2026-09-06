@@ -108,3 +108,25 @@ def validating(all_text):
 
     return Output
 
+# saving the output to our json file
+def saving_json(text):
+    sample_json_file.parent.mkdir(exist_ok=True)
+    sample_json_file.write_text(json.dumps(text, indent=4), encoding="utf-8")
+
+def main():
+    input_text = raw_text_file.read_text(encoding="utf-8")
+    results = validating(input_text)
+    saving_json(results)
+
+    print("         SUMMARY")
+    print("=" * 50)
+    print(f"All Credit cards : {len(results['credit_cards'])}")
+    print(f"All valid emails: {len(results['emails']['all_valid'])}")
+    print(f"rejected cards: {len(results['rejected_cards'])}")
+    print(f"Hashtags all: {len(results['hashtags'])}")
+    print(f"Time extracted: {len(results['times'])}")
+    print(f"I saved all the output details at: {sample_json_file}")
+
+
+if __name__ == "__main__":
+    main()
