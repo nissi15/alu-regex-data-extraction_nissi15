@@ -1,10 +1,10 @@
 #  Data Extraction using Regex
 
-This program extracts data from a raw text file using python and regex commands
+This is a python regex validator program used to extract different data types in raw text.
 
-## Data Types Used
+## I choosed these data types
 
-The program extracts 4 data types:
+ 4 data types:
 
 - Email addresses
 - Credit card numbers
@@ -23,22 +23,22 @@ output/
 README.md
 ```
 
-## Validation
+## All regex validations
  
-- All email addresses are separated into all valid emails, official ALU emails, alumni emails and SI emails.
-- I used luhn algorithm to validate credit cards numbers of multiple lengths.
+- All email addresses are separated into official ALU emails, alumni emails and SI emails.
+- I used luhn algorithm to validate credit cards numbers.
 - Invalid credit cards are rejected.
 - The program also hides credit card numbers leaving the last 4 digits only.
 - All lines containing `<script>` or `DROP TABLE` are ignored to prevent malcious and injected inputs.
 - Time is extracted in both 24 hours and 12 hours format and also rejects all invalid hours in AM/PM format.
-- The program also removes duplicates like hashtags and other data types
+- The program also removes duplicates like hashtags i.e #Nissitech and #Nissitech  
 ## How to Run
 
 ```bash
 python src/main.py
 ```
 
-The result is saved in:
+all the results are saved in:
 
 ```text
 output/sample-output.json

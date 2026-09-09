@@ -10,19 +10,19 @@ sample_json_file = Path("output/sample-output.json")
 
 # regex commands for our data types
 hashtag_regex = r"#[A-Za-z0-9_]+\b"
-time_regex = r"(?<!:)\b(?:(?:0?[1-9]|1[0-2]):[0-5]\d\s*[AP]M|(?:[01]?\d|2[0-3]):[0-5]\d(?!\s*[AP]M))\b(?!:)"
-email_regex= r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"
-credit_card_regex = r"\b(?:\d{4} \d{4} \d{4} \d{4}|\d{4}-\d{4}-\d{4}-\d{4}|\d{4} \d{6} \d{5}|\d{4}-\d{6}-\d{5}|\d{13,19})\b"
+time_regex = r"(?<!:)\b(?:(?:0?[1-9]|1[0-2]):[0-5]\d\s*[AP]M|(?:[01]?\d|2[0-3]):[0-5]\d(?!\s*[AP]M))\b(?!:)" # both 12 and 24 formats
+alu_official_regex =  r"\b[A-Za-z0-9._%+-]+@alueducation\.com\b"
+alu_alumni_regex = r"\b[A-Za-z0-9._%+-]+@alumni\.alueducation\.com\b"
+alu_si_regex =r"\b[A-Za-z0-9'_%+-]+@si\.alueducation\.com\b"
+credit_card_regex = r"\b(?:\d{4} \d{4} \d{4} \d{4}|\d{4}-\d{4}-\d{4}-\d{4}|\d{4} \d{6} \d{5}|\d{4}-\d{6}-\d{5}|\d{13,19})\b"  
 
+Unsafe_regex = r"^.*(?:<script|drop\s+table).*$\n?"
 
 #checking if we have no unsafe text
 def unsafe(text):
-    if "<script>" not in text.lower() and "drop table" not in text.lower():
-        return True
-
-# Using the luhn algorithm to check the cards. where it reverses digits and doubles the 2nd digit(minus 9 when 2 numbers ) and adds everything 
-# if the total is divisible by 10 then the card is real
-
+    return not re.search(r"<script|drop\s+table", text, re.IGNORECASE)
+    
+# Using the luhn algorithm to check the if the cards are real.
 def check_hide_card(card):
     numbers = re.sub(r"\D", "", card)
     total = 0
@@ -38,7 +38,6 @@ def check_hide_card(card):
 
     # hiding the card digits
     hide_card = "*" * (len(numbers) - 4) + numbers[-4:]
-
     if len(set(numbers)) > 1 and total % 10 == 0: #checking for duplicate numbers and also card passes luhn method
         return hide_card, True
     else:
@@ -53,49 +52,21 @@ def removing_duplicate(text):
             proper_text.append(i)
     return proper_text
 
-ALU_OFFICIAL = "@alueducation.com"
-ALU_ALUMNI = "@alumni.alueducation.com"
-ALU_SI = "@si.alueducation.com"
-
-# validating our raw data: emails , creditcards , time and hashtags
+# Extracting data: emails , creditcards , time and hashtags
 def validating(all_text):
-    safe_text = ""
     Output = {
         "hashtags": [],
-        "time": [],
+        "times": [],
         "credit_cards": [],
         "rejected_cards": [],
-        "emails": {
-            "all_valid": [],
-            "alu_official": [],
-            "alu_alumni": [],
-            "alu_si": []
-        },
+        "alu_official_emails": [],
+        "alu_alumni_mails": [],
+        "alu_si_emails": []
     }
-
-    for text in all_text.splitlines():
-        if unsafe(text):
-            safe_text += text + "\n"
-
-    # extracting emails
-    for email in re.findall(email_regex, safe_text):
-        email_lower = email.lower()
-        if email not in Output["emails"]["all_valid"]:
-            Output["emails"]["all_valid"].append(email)
-
-        if email_lower.endswith(ALU_OFFICIAL):
-            if email not in Output["emails"]["alu_official"]:
-                Output["emails"]["alu_official"].append(email)
-        elif email_lower.endswith(ALU_ALUMNI):
-            if email not in Output["emails"]["alu_alumni"]:
-                Output["emails"]["alu_alumni"].append(email)
-        elif email_lower.endswith(ALU_SI):
-            if email not in Output["emails"]["alu_si"]:
-                Output["emails"]["alu_si"].append(email)
-
+    
+    safe_text = re.sub(Unsafe_regex, "", all_text, flags=re.IGNORECASE | re.MULTILINE)
     for card in re.findall(credit_card_regex, safe_text):
         hide_card, valid = check_hide_card(card)
-
         if valid:
             if hide_card not in Output["credit_cards"]:
                 Output["credit_cards"].append(hide_card)
@@ -103,9 +74,14 @@ def validating(all_text):
             if hide_card not in Output["rejected_cards"]:
                 Output["rejected_cards"].append(hide_card)
 
+    #extracting all 3 alu emails
+    Output["alu_si_emails"] = removing_duplicate(re.findall(alu_si_regex, safe_text, re.IGNORECASE))
+    Output["alu_official_emails"] = removing_duplicate(re.findall(alu_official_regex,safe_text, re.IGNORECASE))
+    Output["alu_alumni_mails"] = removing_duplicate(re.findall(alu_alumni_regex, safe_text, re.IGNORECASE))
+    #exract hastags and times
     Output["hashtags"] = removing_duplicate(re.findall(hashtag_regex, safe_text))
     Output["times"] = removing_duplicate(re.findall(time_regex, safe_text, re.IGNORECASE))
-
+    
     return Output
 
 # saving the output to our json file
@@ -117,14 +93,8 @@ def main():
     input_text = raw_text_file.read_text(encoding="utf-8")
     results = validating(input_text)
     saving_json(results)
-
     print("         SUMMARY")
     print("=" * 50)
-    print(f"All Credit cards : {len(results['credit_cards'])}")
-    print(f"All valid emails: {len(results['emails']['all_valid'])}")
-    print(f"rejected cards: {len(results['rejected_cards'])}")
-    print(f"Hashtags all: {len(results['hashtags'])}")
-    print(f"Time extracted: {len(results['times'])}")
     print(f"I saved all the output details at: {sample_json_file}")
 
 
